@@ -33,9 +33,9 @@
    */
   var init = function(tb, options) {  
     var t = $(tb); //the table object is wrapped
-    var t.opt = options; //each table has its own options available at anytime
-    var t.mode = options.resizeMode; //shortcuts
-    var t.dc = t.opt.disabledColumns;
+    t.opt = options; //each table has its own options available at anytime
+    t.mode = options.resizeMode; //shortcuts
+    t.dc = t.opt.disabledColumns;
 
     if (t.opt.removePadding) {
       t.addClass("JPadding");
