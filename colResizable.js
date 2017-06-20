@@ -443,7 +443,7 @@
   };
 
   //bind resize event, to update grips position 
-  $(window).bind('resize.'+SIGNATURE, onResize); 
+  $(window).bind('resize.' + SIGNATURE, onResize); 
 
   /**
    * The plugin is added to the jQuery library
