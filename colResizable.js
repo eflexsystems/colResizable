@@ -24,12 +24,6 @@
   var SIGNATURE ="JColResizer";
   var FLEX = "JCLRFlex";
 
-  var I = parseInt;
-  var M = Math;
-  var ie = navigator.userAgent.indexOf('Trident/4.0')>0;
-  var S;
-  var pad = ""
-
   h.append("<style type='text/css'>  .JColResizer{table-layout:fixed;} .JColResizer > tbody > tr > td, .JColResizer > tbody > tr > th{overflow:hidden}  .JPadding > tbody > tr > td, .JPadding > tbody > tr > th{padding-left:0!important; padding-right:0!important;} .JCLRgrips{ height:0px; position:relative;} .JCLRgrip{margin-left:-5px; position:absolute; z-index:5; } .JCLRgrip .JColResizer{position:absolute;background-color:red;filter:alpha(opacity=1);opacity:0;width:10px;height:100%;cursor: col-resize;top:0px} .JCLRLastGrip{position:absolute; width:1px; } .JCLRgripDrag{ border-left:1px dotted black;  } .JCLRFlex{width:auto!important;} .JCLRgrip.JCLRdisabledGrip .JColResizer{cursor:default; display:none;}</style>");
 
   /**
@@ -44,26 +38,17 @@
         t.dc = t.opt.disabledColumns;
 
     if(t.opt.removePadding) t.addClass("JPadding");
-
-    try {
-      if (t.opt.useLocalStorage) {
-        S = localStorage;
-      } else {
-        S = sessionStorage;
-      }
-    } catch(e) {} //Firefox crashes when executed as local file system
-
     if(t.opt.disable) return destroy(t);        //the user is asking to destroy a previously colResized table
     var id = t.id = t.attr(ID) || SIGNATURE+count++;  //its id is obtained, if null new one is generated    
-    t.p = t.opt.postbackSafe;               //short-cut to detect postback safe     
+    t.p = t.opt.postbackSafe; //short-cut to detect postback safe     
     if(!t.is("table") || tables[id] && !t.opt.partialRefresh) return;     //if the object is not a table or if it was already processed then it is ignored.
     if (t.opt.hoverCursor !== 'col-resize') h.append("<style type='text/css'>.JCLRgrip .JColResizer:hover{cursor:"+ t.opt.hoverCursor +"!important}</style>");  //if hoverCursor has been set, append the style
     t.addClass(SIGNATURE).attr(ID, id).before('<div class="JCLRgrips"/>');  //the grips container object is added. Signature class forces table rendering in fixed-layout mode to prevent column's min-width
     t.g = []; t.c = []; t.w = t.width(); t.gc = t.prev(); t.f=t.opt.fixed;  //t.c and t.g are arrays of columns and grips respectively        
     if(options.marginLeft) t.gc.css("marginLeft", options.marginLeft);    //if the table contains margins, it must be specified
     if(options.marginRight) t.gc.css("marginRight", options.marginRight);   //since there is no (direct) way to obtain margin values in its original units (%, em, ...)
-    t.cs = I(ie? tb.cellSpacing || tb.currentStyle.borderSpacing :t.css('border-spacing'))||2;  //table cellspacing (not even jQuery is fully cross-browser)
-    t.b  = I(ie? tb.border || tb.currentStyle.borderLeftWidth :t.css('border-left-width'))||1;  //outer border width (again cross-browser issues)
+    t.cs = parseInt(t.css('border-spacing'))||2;  //table cellspacing (not even jQuery is fully cross-browser)
+    t.b  = parseInt(t.css('border-left-width'))||1;  //outer border width (again cross-browser issues)
     tables[id] = t;   //the table object is stored using its id as key  
     createGrips(t);   //grips are created 
   };
@@ -89,7 +74,7 @@
     th = th.filter(":visible");         //filter invisible columns
     t.cg = t.find("col");             //a table can also contain a colgroup with col elements   
     t.ln = th.length;             //table length is stored  
-    if(t.p && S && S[t.id])memento(t,th);   //if 'postbackSafe' is enabled and there is data for the current table, its coloumn layout is restored
+    if(t.p && localStorage[t.id])memento(t,th);   //if 'postbackSafe' is enabled and there is data for the current table, its coloumn layout is restored
     th.each(function(i){            //iterate through the table column headers      
       var c = $(this);            //jquery wrap for the current column    
       var dc = t.dc.indexOf(i)!=-1;           //is this a disabled column?
@@ -136,8 +121,8 @@
     var w,m=0,i=0,aux =[],tw;
     if(th){                   //in deserialization mode (after a postback)
       t.cg.removeAttr("width");
-      if(t.opt.flush){ S[t.id] =""; return;}  //if flush is activated, stored data is removed
-      w = S[t.id].split(";");         //column widths is obtained
+      if(t.opt.flush){ localStorage[t.id] =""; return;}  //if flush is activated, stored data is removed
+      w = localStorage[t.id].split(";");         //column widths is obtained
       tw = w[t.ln+1];
       if(!t.f && tw){             //if not fixed and table width data available its size is restored
         t.width(tw*=1);
@@ -153,15 +138,15 @@
       for(i=0;i<t.ln;i++)
         t.cg.eq(i).css("width", aux[i]);  //this code is required in order to create an inline CSS rule with higher precedence than an existing CSS class in the "col" elements
     }else{              //in serialization mode (after resizing a column)
-      S[t.id] ="";        //clean up previous data
+      localStorage[t.id] ="";        //clean up previous data
       for(;i < t.c.length; i++){  //iterate through columns
         w = t.c[i].width();   //width is obtained
-        S[t.id] += w+";";   //width is appended to the sessionStorage object using ID as key
+        localStorage[t.id] += w+";";   //width is appended to the sessionStorage object using ID as key
         m+=w;         //carriage is updated to obtain the full size used by columns
       }
-      S[t.id]+=m;             //the last item of the serialized string is the table's active area (width), 
+      localStorage[t.id]+=m;             //the last item of the serialized string is the table's active area (width), 
                         //to be able to obtain % width value of each columns while deserializing
-      if(!t.f) S[t.id] += ";"+t.width();  //if not fixed, table width is stored
+      if(!t.f) localStorage[t.id] += ";"+t.width();  //if not fixed, table width is stored
     } 
   };
 
@@ -239,7 +224,7 @@
     var last = i == t.ln-1;                       //check if it is the last column's grip (usually hidden)
     var min = i? t.g[i-1].position().left+t.cs+mw: l; //min position according to the contiguous cells
     var max = t.f ? i == t.ln-1? t.w-l: t.g[i+1].position().left-t.cs-mw: Infinity; //max position according to the contiguous cells 
-    x = M.max(min, M.min(max, x));        //apply bounding    
+    x = Math.max(min, Math.min(max, x));        //apply bounding    
     drag.x = x;  drag.css("left",  x + PX);   //apply position increment  
     if(last){ //if it is the last grip
       var c = t.c[drag.i]; //width of the last column is obtained
@@ -330,7 +315,7 @@
           //each browser. In the beginning i had a big switch for each browser, but since the code
           //was extremely ugly now I use a different approach with several re-flows. This works 
           //pretty well but it's a bit slower. For now, lets keep things simple...   
-          for(i=0; i<t.ln; i++) t.c[i].css("width", M.round(1000*t.c[i].w/mw)/10 + "%").l=true; 
+          for(i=0; i<t.ln; i++) t.c[i].css("width", Math.round(1000*t.c[i].w/mw)/10 + "%").l=true; 
           //c.l locks the column, telling us that its c.w is outdated                 
         }else{ //in non fixed-sized tables
           applyBounds(t);         //apply the new bounds 
@@ -367,7 +352,6 @@
         marginRight: null, //in case the table contains any margins, colResizable needs to know the values used, e.g. "10%", "15em", "5px" ...
         disable: false, //disables all the enhancements performed in a previously colResized table  
         partialRefresh: false, //can be used in combination with postbackSafe when the table is inside of an updatePanel,
-        useLocalStorage: false, //use localStorage to save table layout instead of sessionStorage
         disabledColumns: [], //column indexes to be excluded
         removePadding: true, //for some uses (such as multiple range slider), it is advised to set this modifier to true, it will remove padding from the header cells.
         onDrag: null, //callback function to be fired during the column resizing process if liveDrag is enabled
