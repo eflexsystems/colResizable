@@ -59,7 +59,7 @@
     t.addClass(SIGNATURE).attr(ID, id).before('<div class="JCLRgrips"/>');  //the grips container object is added. Signature class forces table rendering in fixed-layout mode to prevent column's min-width
     t.g = [];
     t.c = [];
-    t.w = t.width();
+    t.w = t.outerWidth();
     t.gc = t.prev();
     t.f = t.opt.fixed;  //t.c and t.g are arrays of columns and grips respectively
 
@@ -134,10 +134,10 @@
       g.t = t;
       g.i = i;
       g.c = c;
-      c.w =c.width(); //some values are stored in the grip's node data as shortcut
+      c.w =c.outerWidth(); //some values are stored in the grip's node data as shortcut
       t.g.push(g);
       t.c.push(c); //the current grip and column are added to its table object
-      c.width(c.w).removeAttr("width"); //the width of the column is converted into pixel-based measurements
+      c.outerWidth(c.w).removeAttr("width"); //the width of the column is converted into pixel-based measurements
       g.data(SIGNATURE, {
         i: i,
         t: t.attr(ID),
@@ -185,7 +185,7 @@
       tw = w[t.ln+1];
 
       if(!t.f && tw) { //if not fixed and table width data available its size is restored
-        t.width(tw *= 1);
+        t.outerWidth(tw *= 1);
         if(t.opt.overflow) { //if overfolw flag is set, restore table width also as table min-width
           t.css('min-width', tw + PX);
           t.w = tw;
@@ -204,7 +204,7 @@
       localStorage[t.id] = ""; //clean up previous data
 
       for (; i < t.c.length; i++) { //iterate through columns
-        w = t.c[i].width();   //width is obtained
+        w = t.c[i].outerWidth();   //width is obtained
         localStorage[t.id] += w + ";";   //width is appended to the sessionStorage object using ID as key
         m += w; //carriage is updated to obtain the full size used by columns
       }
@@ -215,7 +215,7 @@
 
       //if not fixed, table width is stored
       if(!t.f) {
-        localStorage[t.id] += ";" + t.width();
+        localStorage[t.id] += ";" + t.outerWidth();
       }
     }
   };
@@ -225,7 +225,7 @@
    * @param {jQuery ref} t - table object
    */
   var syncGrips = function (t) {
-    t.gc.width(t.w); //the grip's container width is updated
+    t.gc.outerWidth(t.w); //the grip's container width is updated
     for (var i = 0; i < t.ln; i++){ //for each column
       var c = t.c[i];
       t.g[i].css({ //height and position of the grip is updated according to the table layout
@@ -249,12 +249,13 @@
     var c2 = t.c[i + 1];
     var w = c.w + inc;
     var w2= c2.w - inc;  //their new width is obtained
-    c.width( w + PX);
-    t.cg.eq(i).width(w + PX);
+
+    c.outerWidth(w + PX);
+    t.cg.eq(i).outerWidth(w + PX);
 
     if (t.f){ //if fixed mode
-      c2.width(w2 + PX);
-      t.cg.eq(i+1).width(w2 + PX);
+      c2.outerWidth(w2 + PX);
+      t.cg.eq(i + 1).outerWidth(w2 + PX);
     } else if (t.opt.overflow) { //if overflow is set, incriment min-width to force overflow
       t.css('min-width', t.w + inc);
     }
@@ -273,12 +274,12 @@
   */
   var applyBounds = function(t) {
     var w = $.map(t.c, function(c) { //obtain real widths
-      return c.width();
+      return c.outerWidth();
     });
 
-    t.width(t.w = t.width()).removeClass(FLEX); //prevent table width changes
+    t.outerWidth(t.w = t.outerWidth()).removeClass(FLEX); //prevent table width changes
     $.each(t.c, function(i, c) {
-      c.width(w[i]).w = w[i]; //set column widths applying bounds (table's max-width)
+      c.outerWidth(w[i]).w = w[i]; //set column widths applying bounds (table's max-width)
     });
     t.addClass(FLEX); //allow table width changes
   };
@@ -308,12 +309,12 @@
     }
     if (t.opt.liveDrag) { //if liveDrag is enabled
       if (last) {
-        c.width(drag.w);
+        c.outerWidth(drag.w);
 
         if (!t.f && t.opt.overflow) { //if overflow is set, incriment min-width to force overflow
           t.css('min-width', t.w + x - drag.l);
         } else {
-          t.w = t.width();
+          t.w = t.outerWidth();
         }
 
       } else {
@@ -351,7 +352,7 @@
       var c = t.g[i].c; //the column being dragged
 
       if (last) {
-        c.width(drag.w);
+        c.outerWidth(drag.w);
         c.w = drag.w;
       } else {
         syncCols(t, i, true); //the columns are updated
@@ -398,7 +399,7 @@
       var c;
       for (var i=0; i < t.ln; i++){
         c = t.c[i]; c.l = false;
-        c.w = c.width(); //if the colum is locked (after browser resize), then c.w must be updated
+        c.w = c.outerWidth(); //if the colum is locked (after browser resize), then c.w must be updated
       }
     }
 
@@ -415,9 +416,9 @@
         t = tables[t];
         var i;
         var mw = 0;
-        t.removeClass(SIGNATURE); //firefox doesn't like layout-fixed in some cases
+
         if (t.f) { //in fixed mode
-          t.w = t.width(); //its new width is kept
+          t.w = t.outerWidth(); //its new width is kept
 
           for (i=0; i < t.ln; i++) {
             mw += t.c[i].w;
