@@ -1,10 +1,10 @@
 {
-	"name": "colresizable",
+	"name": "eflex-colresizable",
 	"version": "1.6.0-1",
 	"description": "jQuery plugin to resize table columns",
 	"title": "colResizable",
 	"author": {
-		"name": "Alvaro Prieto Lauroba",
+		"name": "eFlex Systems",
 		"url": "http://bacubacu.com/colresizable/"
 	},
 	"licenses": [
@@ -35,7 +35,7 @@
 	],
 	"homepage": "http://bacubacu.com/colresizable/",
 	"files": [
-		"colResizable-1.6.min.js",
+		"colResizable.js",
 		"./samples"
 	]
 }
