@@ -1,11 +1,10 @@
 {
 	"name": "@eflexsystems/colresizable",
-	"version": "1.6.1",
+	"version": "1.6.0-1",
 	"description": "jQuery plugin to resize table columns",
 	"title": "colResizable",
 	"author": {
-		"name": "Jacob Jewell",
-		"url": "https://github.com/eflexsystems/colResizable"
+		"name": "eFlex Systems"
 	},
 	"licenses": [
 		{
@@ -17,12 +16,7 @@
 			"url": "GPL-LICENSE.txt"
 		}
 	],
-	"dependencies": {
-		"jquery": "1 - 3"
-	},
 	"devDependencies": {
-		"grunt": "^1.1.0",
-		"grunt-terser": "^1.0.0",
 		"jquery": "1 - 3"
 	},
 	"keywords": [
@@ -38,10 +32,8 @@
 		"resize table columns",
 		"jquery"
 	],
-	"homepage": "https://github.com/eflexsystems/colResizable",
-	"main": "colResizable-1.6.min.js",
 	"files": [
-		"colResizable-1.6.min.js",
+		"colResizable.js",
 		"./samples"
 	]
 }
