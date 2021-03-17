@@ -1,6 +1,6 @@
 {
 	"name": "@eflexsystems/colresizable",
-	"version": "1.6.1-0",
+	"version": "1.6.1",
 	"description": "jQuery plugin to resize table columns",
 	"title": "colResizable",
 	"author": {
